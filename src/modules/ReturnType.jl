@@ -48,7 +48,7 @@ function istypeswift(fn, argtypes::Tuple; fastdispatch::Int=FastDispatchMax)
     arg_types = Tuple_from_typestuple(argtypes)
     rtn_type = Base.return_types(fn, arg_types)[1]
     if isa(rtn_type, Union)
-       (tallytypes(rtn_type) > fastdispatch) && return false
+       (tally_types(rtn_type) > fastdispatch) && return false
        all(isbitstype.(uniontypes(rtn_type))) || return false
     elseif isa(rtn_type,Tuple)
        for item in tupletypes(rtn_type)
