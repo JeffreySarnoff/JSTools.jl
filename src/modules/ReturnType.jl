@@ -1,3 +1,14 @@
+"""
+     module ReturnType
+
+istypestable(function, typesof_args)
+   - is there a unique concrete return type T, where fn(args_oftypes)::T does not throw an exception.
+
+istypeswift(function, typesof_args)
+   - foreach of the return types `fn(args_oftypes)::RT`, `isbitstype(RT) && isconcretetype(RT)`,
+   - and are there few enough return types so dispach over returned values is done at compile-time
+
+"""
 module ReturnType
 
 export istypestable, istypeswift
@@ -7,10 +18,10 @@ using Base: uniontypes
 """
     istypestable(fn, argtypes)
 
-`fn` returns values of a stable type
+`fn` returns values of a stable concrete type
 
-if `istypestable(fn, argtypes)`
-then `y = fn(args)` supports fast dispatch on `y`
+if `istypestable(fn, argtypes)` then dispatch over `y = fn(args)`
+is resolved at compile-time (not at run-time).
 """
 function istypestable(fn, argtypes::Tuple)
     arg_types = typed_as_tuple(argtypes)
@@ -31,7 +42,7 @@ istypestable(fn) = istypestable(fn, ())
 """
     FastDispatchMax
 
-`is_type_stablish(fn, argtypes)` is true if `is_type_stable(fn, argtypes)` or
+`istypeswift(fn, argtypes)` is true if `istypestable(fn, argtypes)` or
  if the type returned is a Union of no more than this many `isbitstype` types.
 """
 const FastDispatchMax = 2
@@ -42,7 +53,7 @@ const FastDispatchMax = 2
 `fn` returns values of a stable type, or 
 `fn` returns values from a Union of `FastDispatchMax` many `isbitstype` types
                                                                         
-if `istypeswift(fn, argtypes)` then `y = fn(args)` supports fast dispatch on `y`
+if `istypeswift(fn, argtypes)` then dispatch on `y = fn(args)` is done at compile-time (not at run-time).
 """
 function istypeswift(fn, argtypes::Tuple; fastdispatch::Int=FastDispatchMax)
     arg_types = Tuple_from_typestuple(argtypes)
